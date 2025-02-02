@@ -156,7 +156,7 @@
         // تحميل ملف الإكسل تلقائيًا عند فتح الصفحة
         async function loadExcelData() {
             try {
-                const response = await fetch('results.xlsx');
+                const response = await fetch('studentData.xlsx');
                 if (!response.ok) throw new Error('فشل في تحميل ملف النتائج');
                 
                 const data = await response.arrayBuffer();
