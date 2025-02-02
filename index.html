@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -42,7 +43,7 @@
             margin-bottom: 20px;
         }
         
-        input[type="file"], input[type="text"] {
+        input[type="text"] {
             padding: 10px;
             margin: 10px 0;
             width: 300px;
@@ -91,6 +92,10 @@
             color: #dc3545;
             margin: 10px 0;
         }
+        
+        .success {
+            color: #28a745;
+        }
     </style>
 </head>
 <body>
@@ -102,17 +107,14 @@
 
         <div class="search-box">
             <h2>نظام استعلام نتائج الطلاب</h2>
-            <input type="file" id="excelFile" accept=".xlsx, .xls">
-            <br>
             <input type="text" id="searchInput" placeholder="ابحث بالرقم القومي">
             <div id="message" class="warning"></div>
         </div>
 
         <div class="certificate" id="certificate">
             <div class="header">
-                <h1>شهادة تحصيل درجات</h1>
-                <h3>مدرسة الشهيد مجدى النبراوى تعليم اساسى</h3>
-                <h4>نتائج الفصل الدراسي 2023/2024</h4>
+    <h3>مدرسة الشهيد مجدى النبراوى تعليم اساسى</h3>
+                <h4>نتائج الفصل الدراسي 2024/2025</h4>
             </div>
             
             <div class="student-info">
@@ -127,9 +129,7 @@
                         <th>الدرجة</th>
                     </tr>
                 </thead>
-                <tbody id="resultsTable">
-                    <!-- سيتم إضافة المواد هنا -->
-                </tbody>
+                <tbody id="resultsTable"></tbody>
             </table>
         </div>
     </div>
@@ -153,25 +153,29 @@
             'الصف'
         ];
 
-        document.getElementById('excelFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
+        // تحميل ملف الإكسل تلقائيًا عند فتح الصفحة
+        async function loadExcelData() {
+            try {
+                const response = await fetch('results.xlsx');
+                if (!response.ok) throw new Error('فشل في تحميل ملف النتائج');
+                
+                const data = await response.arrayBuffer();
+                const workbook = XLSX.read(data, { type: 'array' });
                 const worksheet = workbook.Sheets[workbook.SheetNames[0]];
                 studentData = XLSX.utils.sheet_to_json(worksheet);
-                document.getElementById('message').textContent = 'تم تحميل الملف بنجاح';
-            };
-            
-            reader.readAsArrayBuffer(file);
-        });
+                
+                document.getElementById('message').className = 'success';
+                document.getElementById('message').textContent = '✓ النظام جاهز للبحث';
+            } catch (error) {
+                document.getElementById('message').textContent = '⚠ خطأ: ' + error.message;
+            }
+        }
 
+        // البحث عند إدخال الرقم القومي
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const searchValue = e.target.value.trim();
-            const result = 'https://raw.githubusercontent.com/Medhatt72/NY_students-results.git/main/results.xlsx'; 
-                student['الرقم القومى'] == searchValue
+            const result = studentData.find(student => 
+                student['الرقم القومى'] === searchValue
             );
 
             const certificate = document.getElementById('certificate');
@@ -184,11 +188,13 @@
             } else {
                 certificate.style.display = 'none';
                 if (searchValue.length > 0) {
-                    message.textContent = 'لا توجد نتائج مطابقة للرقم القومي المطلوب';
+                    message.className = 'warning';
+                    message.textContent = 'لا توجد نتائج مطابقة للرقم المدخل';
                 }
             }
         });
 
+        // عرض النتائج
         function displayResult(data) {
             document.getElementById('studentName').textContent = data['اسم الطالب'];
             document.getElementById('nationalId').textContent = data['الرقم القومى'];
@@ -205,6 +211,9 @@
                 tbody.appendChild(tr);
             });
         }
+
+        // تشغيل النظام عند تحميل الصفحة
+        window.addEventListener('DOMContentLoaded', loadExcelData);
     </script>
 </body>
 </html>
