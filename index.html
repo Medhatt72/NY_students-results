@@ -5,11 +5,10 @@
     <title>مدرسة الشهيد مجدى النبراوى - نتائج الطلبة</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <style>
-        /* التنسيقات العامة */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 20px;
             direction: rtl;
             background: linear-gradient(135deg, #ff7e5f, #feb47b, #86a8e7, #91eae4);
             background-size: 400% 400%;
@@ -24,52 +23,50 @@
 
         .container {
             max-width: 800px;
-            margin: 50px auto;
+            margin: 20px auto;
             background-color: rgba(255, 255, 255, 0.95);
-            padding: 30px 40px;
+            padding: 30px;
             border-radius: 12px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }
 
-        h1, h2, h3 {
+        h1, h2 {
             text-align: center;
-            color: #333;
-            margin: 20px 0;
+            color: #2c3e50;
         }
 
-        /* منطقة البحث */
         .search-box {
             text-align: center;
             margin: 30px 0;
         }
 
-        input[type="text"] {
-            padding: 12px;
-            font-size: 18px;
+        #searchInput {
+            padding: 12px 20px;
+            font-size: 16px;
             border: 2px solid #3498db;
-            border-radius: 8px;
-            margin: 10px 0;
+            border-radius: 25px;
             width: 80%;
             max-width: 400px;
-            transition: border-color 0.3s;
+            margin: 10px 0;
+            transition: all 0.3s;
         }
 
-        input[type="text"]:focus {
-            border-color: #2980b9;
+        #searchInput:focus {
             outline: none;
+            border-color: #2980b9;
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.5);
         }
 
-        /* رسائل النظام */
         #message {
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
+            padding: 10px;
             margin: 15px 0;
+            border-radius: 5px;
+            text-align: center;
         }
 
         .warning {
-            background-color: #ffbaba;
-            color: #d8000c;
+            background-color: #ffeeba;
+            color: #856404;
         }
 
         .success {
@@ -77,18 +74,19 @@
             color: #155724;
         }
 
-        /* شهادة النتائج */
         #certificate {
             display: none;
             margin-top: 30px;
             border: 2px solid #3498db;
             border-radius: 10px;
             padding: 20px;
+            background: white;
         }
 
         .student-info p {
             font-size: 18px;
             margin: 15px 0;
+            color: #34495e;
         }
 
         table {
@@ -107,22 +105,23 @@
             background-color: #3498db;
             color: white;
         }
+
+        td {
+            background-color: #f8f9fa;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="school-header">
-            <h1>مدرسة الشهيد مجدى النبراوى تعليم اساسى</h1>
-            <h3>العام الدراسي 2024/2025</h3>
-        </div>
+        <h1>مدرسة الشهيد مجدى النبراوى الإبتدائية</h1>
+        <h2>نظام استعلام نتائج الطلاب 2024/2025</h2>
 
         <div class="search-box">
-            <h2>نظام استعلام نتائج الطلاب</h2>
             <input type="text" id="searchInput" 
-                   placeholder="ادخل الرقم القومي (14 رقمًا)" 
+                   placeholder="ادخل الرقم القومي (14 رقمًا)"
                    maxlength="14"
                    inputmode="numeric">
-            <div id="message" class=""></div>
+            <div id="message"></div>
         </div>
 
         <div id="certificate">
@@ -148,7 +147,7 @@
         const GITHUB_USERNAME = 'Medhatt72';
         const REPO_NAME = 'NY_students-results';
         const EXCEL_FILE_NAME = 'studentData.xlsx';
-        const EXCEL_URL = `https://raw.githubusercontent.com/${Medhatt72}/${NY_students-results}/main/${studentData.xlsx}`;
+        const EXCEL_URL = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/main/${EXCEL_FILE_NAME}`;
 
         // المواد الدراسية
         const SUBJECTS = [
@@ -168,10 +167,8 @@
             'الصف'
         ];
 
-        // متغيرات النظام
         let studentData = [];
 
-        // تحميل بيانات الإكسل
         async function loadExcelData() {
             try {
                 const response = await fetch(EXCEL_URL);
@@ -180,64 +177,72 @@
                 const buffer = await response.arrayBuffer();
                 const workbook = XLSX.read(buffer, { type: 'array' });
                 const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                studentData = XLSX.utils.sheet_to_json(worksheet);
                 
+                // تحويل البيانات مع معالجة خاصة للعناوين
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                const headers = jsonData[0].map(h => h.trim());
+                
+                studentData = jsonData.slice(1).map(row => {
+                    const obj = {};
+                    headers.forEach((header, index) => {
+                        obj[header] = row[index] ? row[index].toString().trim() : '';
+                    });
+                    return obj;
+                });
+
                 showMessage('✓ النظام جاهز للبحث', 'success');
             } catch (error) {
-                showMessage(`⚠ خطأ: ${error.message}`, 'warning`);
+                console.error('Error:', error);
+                showMessage(`⚠ خطأ: ${error.message}`, 'warning');
             }
         }
 
-        // عرض الرسائل
         function showMessage(text, type) {
             const msgElement = document.getElementById('message');
             msgElement.textContent = text;
             msgElement.className = type;
+            if (type === 'warning') setTimeout(() => msgElement.textContent = '', 3000);
         }
 
-        // البحث بالرقم القومي
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const searchValue = e.target.value.trim();
             const certificate = document.getElementById('certificate');
             
-            if (!searchValue) {
-                certificate.style.display = 'none';
-                return;
-            }
+            certificate.style.display = 'none';
+            if (!searchValue) return;
 
             if (searchValue.length !== 14 || isNaN(searchValue)) {
                 showMessage('الرجاء إدخال رقم قومي صحيح (14 رقمًا)', 'warning');
-                certificate.style.display = 'none';
                 return;
             }
 
-            const student = studentData.find(s => s['الرقم القومى']?.toString() === searchValue);
-            
+            const student = studentData.find(s => 
+                s['الرقم القومى'] === searchValue || 
+                s['الرقم القومي'] === searchValue
+            );
+
             if (student) {
                 displayStudentResult(student);
                 certificate.style.display = 'block';
-                showMessage('', '');
             } else {
-                certificate.style.display = 'none';
                 showMessage('لا توجد نتائج مطابقة', 'warning');
             }
         });
 
-        // عرض النتائج
         function displayStudentResult(data) {
             document.getElementById('studentName').textContent = data['اسم الطالب'] || '---';
-            document.getElementById('nationalId').textContent = data['الرقم القومى'] || '---';
+            document.getElementById('nationalId').textContent = data['الرقم القومى'] || data['الرقم القومي'] || '---';
 
             const tbody = document.getElementById('resultsTable');
             tbody.innerHTML = SUBJECTS.map(subject => `
                 <tr>
                     <td>${subject}</td>
-                    <td>${data[subject] ?? '---'}</td>
+                    <td>${data[subject] || '---'}</td>
                 </tr>
             `).join('');
         }
 
-        // بدء التشغيل عند تحميل الصفحة
+        // بدء التشغيل
         window.addEventListener('DOMContentLoaded', () => {
             loadExcelData();
             document.getElementById('searchInput').focus();
