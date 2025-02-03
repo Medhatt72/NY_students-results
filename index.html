@@ -123,7 +123,7 @@
             
             <div class="student-info">
                 <!-- تم تعديل هذا القسم لضمان ظهور الاسم -->
-                <p><strong>ا اسم الطالب:</strong> <span id="studentName" class="student-data">---</span></p>
+                <p><strong> اسم الطالب:</strong> <span id="studentName" class="student-data">---</span></p>
                 <p><strong>الرقم القومي:</strong> <span id="nationalId" class="student-data">---</span></p>
             </div>
 
@@ -224,7 +224,7 @@
 
         // عرض النتائج
         function displayResult(data) {
-            document.getElementById('studentName').textContent = data['اسم الطالب'] || '---';
+            document.getElementById('studentName').textContent = data[' اسم الطالب'] || '---';
             document.getElementById('nationalId').textContent = data['الرقم القومى'] || '---';
 
             const tbody = document.getElementById('resultsTable');
