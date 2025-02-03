@@ -172,8 +172,8 @@
       }
 
       // Assume the first sheet contains the exam data
-      const firstSheetName = workbookData.SheetNames[0];
-      const worksheet = workbookData.Sheets[dataonlin];
+      const firstSheetName = studentData.SheetNames[0];
+      const worksheet = studentData.Sheets[dataonlin];
 
       // Convert the sheet into a 2D array (each sub-array is a row)
       const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
