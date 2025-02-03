@@ -5,132 +5,136 @@
     <title>مدرسة الشهيد مجدى النبراوى - نتائج الطلبة</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <style>
+        /* التنسيقات العامة */
         body {
-            font-family: 'Arial', sans-serif;
-            margin: 20px;
-            background-color: #f0f0f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            direction: rtl;
+            background: linear-gradient(135deg, #ff7e5f, #feb47b, #86a8e7, #91eae4);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
         }
-        
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .container {
             max-width: 800px;
-            margin: 0 auto;
+            margin: 50px auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }
-        
-        .school-header {
+
+        h1, h2, h3 {
+            text-align: center;
+            color: #333;
+            margin: 20px 0;
+        }
+
+        /* منطقة البحث */
+        .search-box {
             text-align: center;
             margin: 30px 0;
-            padding: 15px;
-            background: linear-gradient(to right, #3498db, #2c3e50);
-            color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        
-        .school-header h1 {
-            font-size: 28px;
-            margin: 0;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        
-        .search-box {
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        
+
         input[type="text"] {
-            padding: 10px;
-            margin: 10px 0;
-            width: 300px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        
-        .certificate {
-            background: #fff;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
-            display: none;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #333;
-            padding-bottom: 20px;
-        }
-        
-        .student-info {
-            margin-bottom: 20px;
-            line-height: 2;
+            padding: 12px;
             font-size: 18px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            margin: 10px 0;
+            width: 80%;
+            max-width: 400px;
+            transition: border-color 0.3s;
         }
-        
+
+        input[type="text"]:focus {
+            border-color: #2980b9;
+            outline: none;
+        }
+
+        /* رسائل النظام */
+        #message {
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background-color: #ffbaba;
+            color: #d8000c;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        /* شهادة النتائج */
+        #certificate {
+            display: none;
+            margin-top: 30px;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .student-info p {
+            font-size: 18px;
+            margin: 15px 0;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
-            font-size: 16px;
         }
-        
+
         th, td {
-            border: 1px solid #ddd;
             padding: 12px;
+            border: 1px solid #ddd;
             text-align: right;
         }
-        
+
         th {
-            background-color: #f8f9fa;
-            min-width: 150px;
-        }
-        
-        .warning {
-            color: #dc3545;
-            margin: 10px 0;
-            font-weight: bold;
-        }
-        
-        .success {
-            color: #28a745;
-            font-weight: bold;
+            background-color: #3498db;
+            color: white;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="school-header">
-          <p> إدارة مشتول السوق التعليمية - محافظة الشرقية </p>
             <h1>مدرسة الشهيد مجدى النبراوى تعليم اساسى</h1>
-           
+            <h3>العام الدراسي 2024/2025</h3>
         </div>
 
         <div class="search-box">
             <h2>نظام استعلام نتائج الطلاب</h2>
-            <input type="text" id="searchInput" placeholder="ادخل الرقم القومي (14 رقمًا)" maxlength="14">
-            <div id="message" class="warning"></div>
+            <input type="text" id="searchInput" 
+                   placeholder="ادخل الرقم القومي (14 رقمًا)" 
+                   maxlength="14"
+                   inputmode="numeric">
+            <div id="message" class=""></div>
         </div>
 
-        <div class="certificate" id="certificate">
-            <div class="header">
-                <h1>شهادة تحصيل درجات</h1>
-                <h3>العام الدراسي 2024/2025</h3>
-            </div>
-            
+        <div id="certificate">
             <div class="student-info">
-                <!-- تم تعديل هذا القسم لضمان ظهور الاسم -->
-                <p><strong> اسم الطالب:</strong> <span id="studentName" class="student-data">---</span></p>
-                <p><strong>الرقم القومي:</strong> <span id="nationalId" class="student-data">---</span></p>
+                <p><strong>اسم الطالب:</strong> <span id="studentName">---</span></p>
+                <p><strong>الرقم القومي:</strong> <span id="nationalId">---</span></p>
             </div>
 
             <table>
                 <thead>
                     <tr>
-                        <th>المادة الدراسية</th>
+                        <th>المادة</th>
                         <th>الدرجة</th>
                     </tr>
                 </thead>
@@ -140,14 +144,15 @@
     </div>
 
     <script>
-        // إعدادات يجب تعديلها حسب مستودعك
+        // إعدادات GitHub
         const GITHUB_USERNAME = 'Medhatt72';
-        const REPO_NAME = 'NY_students-results  ';
+        const REPO_NAME = 'NY_students-results';
         const EXCEL_FILE_NAME = 'studentData.xlsx';
+        const EXCEL_URL = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/main/${EXCEL_FILE_NAME}`;
 
-        // روابط المواد الدراسية
-        const subjects = [
-          'اللغة العربية والخط العربي',
+        // المواد الدراسية
+        const SUBJECTS = [
+            'اللغة العربية والخط العربي',
             'اللغة الانجليزية',
             'الدراسات الاجتماعية',
             'رياضيات',
@@ -165,79 +170,71 @@
 
         // متغيرات النظام
         let studentData = [];
-        const excelURL = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/main/${EXCEL_FILE_NAME}`;
 
         // تحميل بيانات الإكسل
         async function loadExcelData() {
             try {
-                const response = await fetch(excelURL);
-                if (!response.ok) throw new Error('فشل في تحميل الملف');
+                const response = await fetch(EXCEL_URL);
+                if (!response.ok) throw new Error('خطأ في تحميل الملف');
                 
-                const data = await response.arrayBuffer();
-                const workbook = XLSX.read(data, { type: 'array' });
+                const buffer = await response.arrayBuffer();
+                const workbook = XLSX.read(buffer, { type: 'array' });
                 const worksheet = workbook.Sheets[workbook.SheetNames[0]];
                 studentData = XLSX.utils.sheet_to_json(worksheet);
                 
-                if (studentData.length === 0) throw new Error('الملف لا يحتوي على بيانات');
-                if (!studentData[0].hasOwnProperty('الرقم القومى')) throw new Error('العمود "الرقم القومى" غير موجود');
-                
-                document.getElementById('message').className = 'success';
-                document.getElementById('message').textContent = '✓ النظام جاهز للبحث';
+                showMessage('✓ النظام جاهز للبحث', 'success');
             } catch (error) {
-                document.getElementById('message').className = 'warning';
-                document.getElementById('message').textContent = `⚠ خطأ: ${error.message}`;
+                showMessage(`⚠ خطأ: ${error.message}`, 'warning`);
             }
+        }
+
+        // عرض الرسائل
+        function showMessage(text, type) {
+            const msgElement = document.getElementById('message');
+            msgElement.textContent = text;
+            msgElement.className = type;
         }
 
         // البحث بالرقم القومي
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const searchValue = e.target.value.trim();
-            const message = document.getElementById('message');
-            message.textContent = '';
-
-            if (searchValue.length === 0) {
-                document.getElementById('certificate').style.display = 'none';
+            const certificate = document.getElementById('certificate');
+            
+            if (!searchValue) {
+                certificate.style.display = 'none';
                 return;
             }
 
             if (searchValue.length !== 14 || isNaN(searchValue)) {
-                message.className = 'warning';
-                message.textContent = 'الرجاء إدخال رقم قومي صحيح (14 رقمًا)';
+                showMessage('الرجاء إدخال رقم قومي صحيح (14 رقمًا)', 'warning');
+                certificate.style.display = 'none';
                 return;
             }
 
-            const result = studentData.find(student => 
-                student['الرقم القومى'].toString() === searchValue
-            );
-
-            const certificate = document.getElementById('certificate');
+            const student = studentData.find(s => s['الرقم القومى']?.toString() === searchValue);
             
-            if (result) {
-                displayResult(result);
+            if (student) {
+                displayStudentResult(student);
                 certificate.style.display = 'block';
+                showMessage('', '');
             } else {
                 certificate.style.display = 'none';
-                message.className = 'warning';
-                message.textContent = 'لا توجد نتائج مطابقة للرقم المدخل';
+                showMessage('لا توجد نتائج مطابقة', 'warning');
             }
         });
 
         // عرض النتائج
-        function displayResult(data) {
-            document.getElementById('studentName').textContent = data[' اسم الطالب'] || '---';
+        function displayStudentResult(data) {
+            document.getElementById('studentName').textContent = data['اسم الطالب'] || '---';
             document.getElementById('nationalId').textContent = data['الرقم القومى'] || '---';
 
             const tbody = document.getElementById('resultsTable');
-            tbody.innerHTML = '';
-            
-            subjects.forEach(subject => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
+            tbody.innerHTML = SUBJECTS.map(subject => `
+                <tr>
                     <td>${subject}</td>
-                    <td>${data[subject] || '---'}</td>
-                `;
-                tbody.appendChild(tr);
-            });
+                    <td>${data[subject] ?? '---'}</td>
+                </tr>
+            `).join('');
         }
 
         // بدء التشغيل عند تحميل الصفحة
