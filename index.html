@@ -1,68 +1,87 @@
 <!DOCTYPE html>
-<html lang="en" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>My School - Exam Results</title>
+  <title>مدرستي - نتائج الامتحانات</title>
   <style>
-    /* Overall Page Styling */
+    /* Modern, Multi-Color Gradient Background */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #a8e063, #56ab2f);
       margin: 0;
       padding: 0;
       direction: rtl;
+      background: linear-gradient(135deg, #ff7e5f, #feb47b, #86a8e7, #91eae4);
+      background-size: 400% 400%;
+      animation: gradientAnimation 15s ease infinite;
     }
+
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Container */
     .container {
       max-width: 800px;
-      margin: 40px auto;
-      background-color: #fff;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      margin: 50px auto;
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     }
+
     h1 {
       text-align: center;
       color: #333;
       margin-bottom: 30px;
     }
-    /* Form Styling */
-    .upload-section,
+
+    /* Search Section */
     .search-section {
       text-align: center;
       margin-bottom: 20px;
     }
-    input[type="text"], input[type="file"] {
-      padding: 10px;
-      font-size: 16px;
-      border: 2px solid #56ab2f;
-      border-radius: 5px;
-      margin: 5px 0;
+    input[type="text"] {
+      padding: 12px;
+      font-size: 18px;
+      border: 2px solid #3498db;
+      border-radius: 8px;
+      margin: 8px 0;
       width: 80%;
       max-width: 400px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    input[type="text"]:focus {
+      border-color: #2980b9;
     }
     button {
-      padding: 10px 20px;
-      font-size: 16px;
+      padding: 12px 30px;
+      font-size: 18px;
       border: none;
-      background-color: #56ab2f;
+      background-color: #3498db;
       color: #fff;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
       margin-top: 10px;
       transition: background-color 0.3s;
     }
     button:hover {
-      background-color: #3e8e1e;
+      background-color: #2980b9;
     }
+
+    /* Error Message */
     .error {
       color: #d8000c;
       background-color: #ffbaba;
-      padding: 10px;
-      border-radius: 5px;
+      padding: 12px;
+      border-radius: 8px;
       text-align: center;
       margin-top: 20px;
     }
-    /* Vertical Table Styling */
+
+    /* Vertical Results Table */
     .result-table {
       width: 100%;
       border-collapse: collapse;
@@ -70,22 +89,23 @@
     }
     .result-table th,
     .result-table td {
-      padding: 12px 20px;
+      padding: 14px 20px;
       border: 1px solid #ddd;
       text-align: right;
     }
     .result-table th {
-      background-color: #56ab2f;
+      background-color: #3498db;
       color: #fff;
       width: 40%;
     }
     .result-table td {
-      background-color: #f9f9f9;
+      background-color: #f1f1f1;
       color: #333;
     }
-    /* Responsive styling */
+
+    /* Responsive Design */
     @media (max-width: 600px) {
-      input[type="text"], input[type="file"] {
+      input[type="text"] {
         width: 95%;
       }
     }
@@ -94,13 +114,6 @@
 <body>
   <div class="container">
     <h1>مدرستي - نتائج الامتحانات</h1>
-    
-    <!-- File Upload for Excel Data (uploaded once) -->
-    <div class="upload-section">
-      <label for="excelFile"><strong>قم بتحميل ملف نتائج الامتحانات:</strong></label>
-      <br>
-      <input type="file" id="excelFile" accept=".xlsx, .xls">
-    </div>
     
     <!-- Search Box for National ID -->
     <div class="search-section">
@@ -116,21 +129,31 @@
   <!-- Include SheetJS library from CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script>
-    // Variable to store the uploaded workbook data
+    // Global variable to store the loaded workbook data
     let workbookData = null;
 
-    // Listen for Excel file upload
-    document.getElementById('excelFile').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const data = new Uint8Array(e.target.result);
-        // Read the file using SheetJS
-        workbookData = XLSX.read(data, { type: 'array' });
-        alert('تم تحميل ملف الإكسل بنجاح.');
-      };
-      reader.readAsArrayBuffer(file);
+    // URL of the hosted Excel file (replace with your actual URL)
+    const excelFileUrl = 'YOUR_EXCEL_FILE_URL_HERE'; // e.g., "https://raw.githubusercontent.com/username/repo/branch/results.xlsx"
+
+    // Automatically load the Excel file when the page loads
+    window.addEventListener('load', function() {
+      fetch(excelFileUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok.');
+          }
+          return response.arrayBuffer();
+        })
+        .then(arrayBuffer => {
+          // Read the Excel file using SheetJS
+          workbookData = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
+          console.log('Excel file loaded successfully.');
+        })
+        .catch(error => {
+          console.error('Error loading Excel file:', error);
+          const resultDiv = document.getElementById('result');
+          resultDiv.innerHTML = '<p class="error">خطأ في تحميل ملف الإكسل. الرجاء المحاولة لاحقاً.</p>';
+        });
     });
 
     // Listen for Search button click
@@ -140,7 +163,7 @@
       resultDiv.innerHTML = ''; // Clear previous results
 
       if (!workbookData) {
-        resultDiv.innerHTML = '<p class="error">الرجاء تحميل ملف الإكسل أولاً.</p>';
+        resultDiv.innerHTML = '<p class="error">لم يتم تحميل ملف الإكسل بعد. الرجاء الانتظار لبضع ثوانٍ.</p>';
         return;
       }
       if (!searchId) {
@@ -159,14 +182,12 @@
         return;
       }
 
-      // data[0] is assumed to be the header row.
-      // We assume:
-      //   Column 0: National ID, Column 1: Student Name, Columns 2-14: Grades for 13 subjects.
+      // Assume:
+      // Column 0: National ID, Column 1: Student Name, Columns 2-14: Grades for 13 subjects.
       let recordFound = false;
       let record = null;
-      for (let i = 1; i < data.length; i++) { // start from 1, assuming row 0 is header
+      for (let i = 1; i < data.length; i++) { // Start from row 1 (after header)
         const row = data[i];
-        // Compare as strings for flexibility
         if (String(row[0]).trim() === searchId) {
           recordFound = true;
           record = row;
@@ -180,14 +201,12 @@
       }
 
       // Create a vertical table to display results.
-      // We will show each field on a separate row: the first column is the label (from the header row)
-      // and the second column is the corresponding data from the record.
+      // Each row shows a field label (from the header row) and the corresponding data.
       let tableHtml = '<table class="result-table">';
       const headerRow = data[0];
-      
-      // For National ID, Student Name and 13 subjects (columns 0 to 14)
+
+      // For National ID, Student Name, and 13 subjects (columns 0 to 14)
       for (let j = 0; j < 15; j++) {
-        // Skip if header is undefined
         if (headerRow[j] === undefined) continue;
         tableHtml += '<tr>';
         tableHtml += '<th>' + headerRow[j] + '</th>';
